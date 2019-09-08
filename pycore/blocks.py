@@ -1,6 +1,14 @@
 
 from .tikzeng import *
 
+def to_sideskip(of1,of2,to1,to2,to_offset):
+    if of1==of2:
+        return [to_sideskip0(of1,to1,to_offset),
+            to_sideskip2(to1,to2,to_offset)]    
+    else:
+        return [to_sideskip1(of1,of2,to1,to_offset),
+            to_sideskip2(to1,to2,to_offset)]
+
 #define new block
 def block_2ConvPool( name, botton, top, s_filer=256, n_filer=64, offset="(1,0,0)", size=(32,32,3.5), opacity=0.5 ):
     return [
