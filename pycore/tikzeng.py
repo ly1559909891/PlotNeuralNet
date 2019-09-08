@@ -34,9 +34,9 @@ def to_begin():
 
 # layers definition
 
-def to_input( pathfile, to='(-3,0,0)', width=8, height=8, name="temp" ):
+def to_input( pathfile, offset=0,to='(-3,0,0)', width=8, height=8, name="temp" ):
     return r"""
-\node[canvas is zy plane at x=0] (""" + name + """) at """+ to +""" {\includegraphics[width="""+ str(width)+"cm"+""",height="""+ str(height)+"cm"+"""]{"""+ pathfile +"""}};
+\node[canvas is zy plane at x="""+str(offset)+"""] (""" + name + """) at """+ to +""" {\includegraphics[width="""+ str(width)+"cm"+""",height="""+ str(height)+"cm"+"""]{"""+ pathfile +"""}};
 """
 
 # Conv
@@ -54,6 +54,74 @@ def to_Conv( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", widt
         depth="""+ str(depth) +"""
         }
     };
+"""
+# DeConv
+def to_DeConv( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" " ):
+    return r"""
+\pic[shift={"""+ offset +"""}] at """+ to +""" 
+    {Box={
+        name=""" + name +""",
+        caption="""+ caption +r""",
+        xlabel={{"""+ str(n_filer) +""", }},
+        zlabel="""+ str(s_filer) +r""",
+        fill={rgb:white,1;black,3},
+        height="""+ str(height) +""",
+        width="""+ str(width) +""",
+        depth="""+ str(depth) +"""
+        }
+    };
+"""
+
+def to_yourConv( name, s_filer=256, n_filer=64, offset="(0,0,0)", to="(0,0,0)", width=1, height=40, depth=40, caption=" " ,ConvColor=(5,2.5,5)):
+    red=ConvColor[0]
+    green=ConvColor[1]
+    blue=ConvColor[2]
+    
+    return r"""
+\pic[shift={"""+ offset +"""}] at """+ to +""" 
+    {Box={
+        name=""" + name +""",
+        caption="""+ caption +r""",
+        xlabel={{"""+ str(n_filer) +""", }},
+        zlabel="""+ str(s_filer) +r""",
+        fill={rgb:red,"""+str(red)+""";green,"""+str(green)+""";blue,"""+str(blue)+r"""},
+        height="""+ str(height) +""",
+        width="""+ str(width) +""",
+        depth="""+ str(depth) +"""
+        }
+    };
+"""
+
+def to_sideskip0(of,to,to_offset):
+    return r"""
+\path ("""+of+"""-west) -- ("""+of+"""-east) coordinate[pos=2] ("""+of+"""-after) ;    
+  
+\draw [connection]  ("""+of+"""-east) -- node {\midarrow} ("""+of+"""-after) -- node {\midarrow} ++(0,0,"""+str(to_offset)+""") -- node {\midarrow} ("""+to+"""-west);
+"""
+
+def to_sideskip1(of1,of2,to,to_offset):
+    return r"""
+\path ("""+of1+"""-east) -- ("""+of2+"""-west) coordinate[pos=0.4] ("""+of1+"""-after) ;
+\draw [connection]  ("""+of1+"""-after) -- node {\midarrow} ++(0,0,"""+str(to_offset)+""") -- node {\midarrow} ("""+to+"""-west);
+"""
+
+def to_sideskip2(of,to,of_offset):
+    return r"""
+    \path ("""+to+"""-west) -- ("""+to+"""-east) coordinate[pos=0.5] ("""+to+"""-mid) ;
+\path ("""+to+"""-mid) ++(0,0,"""+str(of_offset)+""") --("""+to+"""-farwest) coordinate[pos=0.0] ("""+to+"""-side) ;
+\draw [connection]  ("""+of+"""-east) -- node {\midarrow}  ("""+to+"""-side) -- node {\midarrow} ("""+to+"""-near);
+"""
+
+def to_down2skip( of, to, pos=1.25,htrate=1):
+    pos_of=pos
+    pos_to=pos*htrate
+    return r"""
+\path ("""+ of +"""-east) -- ("""+ of +"""-northeast) coordinate[pos="""+ str(pos_of) +"""] ("""+ of +"""-top) ;
+\path ("""+ to +"""-west)  -- ("""+ to +"""-northwest)  coordinate[pos="""+ str(pos_to) +"""] ("""+ to +"""-top) ;
+\draw [copyconnection]  ("""+of+"""-southeast)  
+-- node {\copymidarrow}("""+of+"""-top)
+-- node {\copymidarrow}("""+to+"""-top)
+-- node {\copymidarrow} ("""+to+"""-southwest);
 """
 
 # Conv,Conv,relu
